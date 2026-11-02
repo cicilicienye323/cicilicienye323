@@ -80,6 +80,38 @@ export function ctaSvg() {
 `;
 }
 
+// Owner repos only; forks dropped by GitHub, private and archived included.
+export const REPO_QUERY = `query($cursor: String) {
+  viewer {
+    repositories(first: 100, after: $cursor, ownerAffiliations: OWNER, isFork: false) {
+      pageInfo { hasNextPage endCursor }
+      nodes { languages(first: 20) { edges { size node { name color } } } }
+    }
+  }
+}`;
+
+export function languageTotals(nodes) {
+  const totals = {};
+  for (const { languages } of nodes) {
+    for (const { size, node } of languages.edges) {
+      totals[node.name] ??= { bytes: 0, color: node.color };
+      totals[node.name].bytes += size;
+    }
+  }
+  return totals;
+}
+
+// Top 5 by bytes plus an "Other" row for the rest, one decimal.
+export function languagePercents(totals) {
+  const sorted = Object.entries(totals).sort((a, b) => b[1].bytes - a[1].bytes);
+  const sum = sorted.reduce((n, [, t]) => n + t.bytes, 0);
+  const pct = (bytes) => Math.round(bytes * 1000 / sum) / 10;
+  const rows = sorted.slice(0, 5).map(([name, t]) => ({ name, color: t.color, pct: pct(t.bytes) }));
+  const rest = sorted.slice(5).reduce((n, [, t]) => n + t.bytes, 0);
+  if (rest > 0) rows.push({ name: 'Other', color: null, pct: pct(rest) });
+  return rows;
+}
+
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
 export function languagesSvg(rows) {
