@@ -224,25 +224,33 @@ export function languagesSvg(rows) {
 `;
 }
 
-// All repo pages from GitHub GraphQL. Throws on HTTP or GraphQL errors so the
-// workflow fails and the last committed languages.svg stays.
+// One GitHub GraphQL call. Throws on HTTP or GraphQL errors so the workflow
+// fails and the last committed SVGs stay.
+async function graphql(token, query, variables, fetchImpl) {
+  const res = await fetchImpl('https://api.github.com/graphql', {
+    method: 'POST',
+    headers: { Authorization: `bearer ${token}`, 'User-Agent': 'cicilicienye323-profile', 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query, variables }),
+  });
+  if (!res.ok) throw new Error(`GitHub API HTTP ${res.status}`);
+  const json = await res.json();
+  if (json.errors?.length) throw new Error(`GitHub API: ${json.errors[0].message}`);
+  return json.data;
+}
+
 export async function fetchLanguages(token, fetchImpl = fetch) {
   const nodes = [];
   let cursor = null;
   do {
-    const res = await fetchImpl('https://api.github.com/graphql', {
-      method: 'POST',
-      headers: { Authorization: `bearer ${token}`, 'User-Agent': 'cicilicienye323-profile', 'Content-Type': 'application/json' },
-      body: JSON.stringify({ query: REPO_QUERY, variables: { cursor } }),
-    });
-    if (!res.ok) throw new Error(`GitHub API HTTP ${res.status}`);
-    const json = await res.json();
-    if (json.errors?.length) throw new Error(`GitHub API: ${json.errors[0].message}`);
-    const page = json.data.viewer.repositories;
+    const page = (await graphql(token, REPO_QUERY, { cursor }, fetchImpl)).viewer.repositories;
     nodes.push(...page.nodes);
     cursor = page.pageInfo.hasNextPage ? page.pageInfo.endCursor : null;
   } while (cursor);
   return nodes;
+}
+
+export async function fetchCalendar(token, fetchImpl = fetch) {
+  return (await graphql(token, CALENDAR_QUERY, {}, fetchImpl)).viewer.contributionsCollection.contributionCalendar;
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
@@ -256,10 +264,13 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     const token = process.env.PROFILE_PAT;
     if (!token) throw new Error('PROFILE_PAT is not set');
     const rows = languagePercents(languageTotals(await fetchLanguages(token)));
-    await writeFile(new URL('languages.svg', out), languagesSvg(rows));
-    console.log('wrote assets/languages.svg');
+    const cal = await fetchCalendar(token);
+    for (const [file, svg] of [['city.svg', citySvg(cal)], ['languages.svg', languagesSvg(rows)]]) {
+      await writeFile(new URL(file, out), svg);
+      console.log(`wrote assets/${file}`);
+    }
   } catch (err) {
-    console.error(`languages.svg not updated: ${err.message}`);
+    console.error(`city.svg and languages.svg not updated: ${err.message}`);
     process.exit(1);
   }
 }
