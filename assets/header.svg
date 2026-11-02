@@ -1,5 +1,31 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="840" height="200" viewBox="0 0 840 200">
-  <polygon points="14,0 840,0 840,186 826,200 0,200 0,14" fill="#181B1F"/>
-  <circle cx="420" cy="100" r="60" fill="none" stroke="#C6FF00" stroke-width="3"/>
-  <text x="420" y="105" text-anchor="middle" font-family="monospace" font-size="14" fill="#7D858F">SIENVERSE</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="840" height="300" viewBox="0 0 840 300" role="img" aria-label="Status active">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#181B1F"/><stop offset="1" stop-color="#1D2228"/></linearGradient>
+    <pattern id="grid" width="28" height="28" patternUnits="userSpaceOnUse"><path d="M28 0H0V28" fill="none" stroke="#fff" stroke-opacity=".04"/></pattern>
+    <pattern id="dots" width="6" height="6" patternUnits="userSpaceOnUse"><circle cx="3" cy="3" r="1.2" fill="#C6FF00"/></pattern>
+    <path id="circ" d="M420,150 m-96,0 a96,96 0 1,1 192,0 a96,96 0 1,1 -192,0"/>
+  </defs>
+  <polygon points="14,0 840,0 840,286 826,300 0,300 0,14" fill="url(#bg)"/>
+  <polygon points="14,0 840,0 840,286 826,300 0,300 0,14" fill="url(#grid)"/>
+  <g transform="translate(40 30) rotate(12)">
+    <polygon points="0,0 46,6 38,38 4,30" fill="#FF2E88" opacity=".8" transform="translate(-2 0)"/>
+    <polygon points="0,0 46,6 38,38 4,30" fill="#19E3FF" opacity=".8" transform="translate(2 0)"/>
+    <polygon points="0,0 46,6 38,38 4,30" fill="#181B1F"/>
+    <polygon points="0,0 46,6 38,38 4,30" fill="url(#dots)"/>
+  </g>
+  <g transform="translate(770 236) rotate(-20)">
+    <polygon points="0,0 30,4 26,24 2,20" fill="#FF2E88" opacity=".8" transform="translate(-2 0)"/>
+    <polygon points="0,0 30,4 26,24 2,20" fill="#19E3FF" opacity=".8" transform="translate(2 0)"/>
+    <polygon points="0,0 30,4 26,24 2,20" fill="#181B1F"/>
+    <polygon points="0,0 30,4 26,24 2,20" fill="url(#dots)"/>
+  </g>
+  <g class="spin">
+    <circle cx="420" cy="150" r="112" fill="none" stroke="#C6FF00" stroke-dasharray="2 7" opacity=".7"/>
+    <text font-family="'Chakra Petch', sans-serif" font-weight="700" font-size="11" letter-spacing="3.2" fill="#7D858F"><textPath href="#circ">READY · TO · WORK · ACROSS · THE · DESIGN · &amp; · CODE · VERSE ·</textPath></text>
+  </g>
+  <circle cx="420" cy="150" r="80" fill="none" stroke="#2a3037"/>
+  <circle cx="420" cy="150" r="80" fill="none" stroke="#C6FF00" stroke-width="3" stroke-dasharray="120 383" transform="rotate(-90 420 150)"/>
+  <path d="M420 112 448 122v24c0 18-12 28-28 34-16-6-28-16-28-34V122z" fill="#C6FF00"/>
+  <polyline points="402,156 413,146 421,151 436,134" fill="none" stroke="#000" stroke-width="4"/>
+  <text x="420" y="202" text-anchor="middle" font-family="'Chakra Petch', sans-serif" font-weight="700" font-size="10" letter-spacing="2" fill="#C6FF00">STATUS ACTIVE</text>
 </svg>
