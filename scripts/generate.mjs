@@ -117,6 +117,19 @@ export function languagePercents(totals) {
   return rows;
 }
 
+export const CALENDAR_QUERY = `{ viewer { contributionsCollection { contributionCalendar {
+  totalContributions
+  weeks { contributionDays { date contributionCount } }
+} } } }`;
+
+// Days come oldest first, so ">=" keeps the latest date on a tie.
+export function cityStats(cal) {
+  const days = cal.weeks.flatMap((w) => w.contributionDays);
+  let busiest = { date: null, count: -1 };
+  for (const d of days) if (d.contributionCount >= busiest.count) busiest = { date: d.date, count: d.contributionCount };
+  return { total: cal.totalContributions, active: days.filter((d) => d.contributionCount > 0).length, busiest };
+}
+
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
 export function languagesSvg(rows) {
