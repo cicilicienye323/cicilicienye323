@@ -4,4 +4,6 @@
 
 <a href="#"><img src="./assets/cta.svg" width="280" alt="View portfolio" /></a>
 
+<img src="./assets/languages.svg" width="100%" alt="Language stack" />
+
 </div>
