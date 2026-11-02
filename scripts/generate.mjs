@@ -1,6 +1,12 @@
 // Writes the profile SVGs into assets/.
+import { readFileSync } from 'node:fs';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
+
+// Chakra Petch Bold, subset to the glyphs used here (OFL, see fonts/OFL.txt).
+// Rebuild the subset when a new character appears in any label.
+const fontB64 = readFileSync(new URL('../fonts/ChakraPetch-Bold-subset.woff', import.meta.url)).toString('base64');
+const fontFace = `<style>@font-face { font-family: 'Chakra Petch'; font-weight: 700; src: url(data:font/woff;base64,${fontB64}) format('woff'); }</style>`;
 
 export const tokens = {
   surface: '#181B1F',
@@ -35,6 +41,7 @@ export function headerSvg() {
     <pattern id="dots" width="6" height="6" patternUnits="userSpaceOnUse"><circle cx="3" cy="3" r="1.2" fill="${tokens.lime}"/></pattern>
     <path id="circ" d="M${cx},${cy} m-96,0 a96,96 0 1,1 192,0 a96,96 0 1,1 -192,0"/>
   </defs>
+  ${fontFace}
   <style>
     .spin { transform-origin: ${cx}px ${cy}px; animation: spin 30s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
@@ -60,6 +67,7 @@ export function headerSvg() {
 export function ctaSvg() {
   const w = 280, h = 64, cut = 10;
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" role="img" aria-label="View portfolio">
+  ${fontFace}
   <polygon points="${cut},0 ${w},0 ${w},${h - cut} ${w - cut},${h} 0,${h} 0,${cut}" fill="${tokens.lime}"/>
   <text x="${w / 2}" y="38" text-anchor="middle" ${FONT} font-size="15" letter-spacing="3.3" fill="#000">VIEW PORTFOLIO ›</text>
 </svg>
