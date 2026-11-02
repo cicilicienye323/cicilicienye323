@@ -152,11 +152,42 @@ export function languagesSvg(rows) {
 `;
 }
 
+// All repo pages from GitHub GraphQL. Throws on HTTP or GraphQL errors so the
+// workflow fails and the last committed languages.svg stays.
+export async function fetchLanguages(token, fetchImpl = fetch) {
+  const nodes = [];
+  let cursor = null;
+  do {
+    const res = await fetchImpl('https://api.github.com/graphql', {
+      method: 'POST',
+      headers: { Authorization: `bearer ${token}`, 'User-Agent': 'cicilicienye323-profile', 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query: REPO_QUERY, variables: { cursor } }),
+    });
+    if (!res.ok) throw new Error(`GitHub API HTTP ${res.status}`);
+    const json = await res.json();
+    if (json.errors?.length) throw new Error(`GitHub API: ${json.errors[0].message}`);
+    const page = json.data.viewer.repositories;
+    nodes.push(...page.nodes);
+    cursor = page.pageInfo.hasNextPage ? page.pageInfo.endCursor : null;
+  } while (cursor);
+  return nodes;
+}
+
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const out = new URL('../assets/', import.meta.url);
   await mkdir(out, { recursive: true });
   for (const [file, svg] of [['header.svg', headerSvg()], ['cta.svg', ctaSvg()]]) {
     await writeFile(new URL(file, out), svg);
     console.log(`wrote assets/${file}`);
+  }
+  try {
+    const token = process.env.PROFILE_PAT;
+    if (!token) throw new Error('PROFILE_PAT is not set');
+    const rows = languagePercents(languageTotals(await fetchLanguages(token)));
+    await writeFile(new URL('languages.svg', out), languagesSvg(rows));
+    console.log('wrote assets/languages.svg');
+  } catch (err) {
+    console.error(`languages.svg not updated: ${err.message}`);
+    process.exit(1);
   }
 }
