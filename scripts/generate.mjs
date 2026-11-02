@@ -176,7 +176,7 @@ export function citySvg(cal) {
     <text x="-2" fill="${tokens.magenta}" opacity=".8">THE CITY I BUILT THIS YEAR</text><text x="2" fill="${tokens.cyan}" opacity=".8">THE CITY I BUILT THIS YEAR</text><text fill="#E9ECEF">THE CITY I BUILT THIS YEAR</text>
   </g>
   <g class="city" transform="translate(20 92)">${blocks.map((b) => b.svg).join('')}</g>
-  <text x="640" y="250" ${mono}>${total}</text><text x="640" y="270" ${label}>CONTRIBUTIONS</text>
+  <text x="640" y="250" ${mono}>${Number(total) || 0}</text><text x="640" y="270" ${label}>CONTRIBUTIONS</text>
   <text x="640" y="320" ${mono}>${active}</text><text x="640" y="340" ${label}>ACTIVE DAYS</text>
   <text x="640" y="390" ${mono}>${busiest.date ? shortDate(busiest.date) : '-'}</text><text x="640" y="410" ${label}>BUSIEST DAY · ${Math.max(0, busiest.count)}</text>
   <path d="M640 216H810M640 286H810M640 356H810" stroke="${tokens.line}"/>

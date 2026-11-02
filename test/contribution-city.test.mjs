@@ -78,3 +78,10 @@ test('AC-6 README shows city.svg between the cta and languages, full width, not 
   assert.match(img, /alt="Contribution city"/);
   assert.ok(!/<a [^>]*>\s*<img src="\.\/assets\/city\.svg"/.test(md), 'city must not be linked');
 });
+
+// Security finding (05-TESTING): totalContributions must be a number in the svg
+test('AC-3 a non-numeric total from the API never reaches the svg as markup', () => {
+  const svg = fn('citySvg')({ ...CAL, totalContributions: '<x>' });
+  assert.ok(!svg.includes('<x>'), 'raw total reached the svg');
+  assert.ok(svg.includes('>0<'), 'non-numeric total shows as 0');
+});
