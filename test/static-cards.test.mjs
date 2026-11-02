@@ -29,9 +29,11 @@ test('AC-2 ring rotates via CSS keyframes and stops for reduced motion', () => {
 });
 
 // AC-3
-test('AC-3 cta.svg is a 280x64 button reading VIEW PORTFOLIO ›', () => {
+test('AC-3 cta.svg is an 840x56 full-width button reading VIEW PORTFOLIO ›', () => {
   const svg = render('ctaSvg');
-  assert.match(svg, /^<svg [^>]*width="280"[^>]*height="64"/);
+  assert.match(svg, /^<svg [^>]*width="840"[^>]*height="56"/);
+  assert.ok(svg.includes('points="14,0 840,0 840,42 826,56 0,56 0,14"'), '14px cut corners like the other cards');
+  assert.match(svg, /font-size="22"[^>]*>VIEW PORTFOLIO ›</);
   assert.ok(svg.includes('VIEW PORTFOLIO ›'), 'button label missing');
   assert.ok(svg.includes('#C6FF00'), 'lime missing');
 });
@@ -48,7 +50,7 @@ for (const name of ['headerSvg', 'ctaSvg']) {
 }
 
 // AC-5
-test('AC-5 README shows header without link, then cta linked to # at fixed 280 width', async () => {
+test('AC-5 README shows header without link, then cta linked to # at full width', async () => {
   const md = await readFile(new URL('../README.md', import.meta.url), 'utf8');
   const header = md.match(/<img src="\.\/assets\/header\.svg"[^>]*>/)?.[0];
   const cta = md.match(/<a href="#">\s*<img src="\.\/assets\/cta\.svg"[^>]*>\s*<\/a>/)?.[0];
@@ -59,5 +61,5 @@ test('AC-5 README shows header without link, then cta linked to # at fixed 280 w
   assert.match(header, /alt="Status active"/);
   assert.match(header, /width="100%"/);
   assert.match(cta, /alt="View portfolio"/);
-  assert.match(cta, /width="280"/);
+  assert.match(cta, /width="100%"/);
 });

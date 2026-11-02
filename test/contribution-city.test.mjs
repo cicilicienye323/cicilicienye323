@@ -68,12 +68,13 @@ test('AC-5 fetchCalendar rejects on HTTP error and on GraphQL errors', async () 
 });
 
 // AC-6
-test('AC-6 README shows city.svg between the cta and languages, full width, not linked', async () => {
+test('AC-6 README shows city.svg between the header and languages, full width, not linked', async () => {
   const md = await readFile(new URL('../README.md', import.meta.url), 'utf8');
   const img = md.match(/<img src="\.\/assets\/city\.svg"[^>]*>/)?.[0];
   assert.ok(img, 'city img missing');
   const at = md.indexOf(img);
-  assert.ok(md.indexOf('cta.svg') < at && at < md.indexOf('languages.svg'), 'city must sit between cta and languages');
+  assert.ok(md.indexOf('header.svg') < at && at < md.indexOf('languages.svg'), 'city must sit between header and languages');
+  assert.ok(md.indexOf('languages.svg') < md.indexOf('cta.svg'), 'cta must be last');
   assert.match(img, /width="100%"/);
   assert.match(img, /alt="Contribution city"/);
   assert.ok(!/<a [^>]*>\s*<img src="\.\/assets\/city\.svg"/.test(md), 'city must not be linked');

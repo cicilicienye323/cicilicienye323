@@ -97,11 +97,11 @@ test('AC-6 bars grow once and cursor blinks, both still for reduced motion', () 
 });
 
 // AC-7
-test('AC-7 README shows languages.svg below the cta, full width, not linked', async () => {
+test('AC-7 README shows languages.svg above the cta, full width, not linked', async () => {
   const md = await readFile(new URL('../README.md', import.meta.url), 'utf8');
   const img = md.match(/<img src="\.\/assets\/languages\.svg"[^>]*>/)?.[0];
   assert.ok(img, 'languages img missing');
-  assert.ok(md.indexOf('cta.svg') < md.indexOf(img), 'languages must come after cta');
+  assert.ok(md.indexOf(img) < md.indexOf('cta.svg'), 'languages must come before the cta at the bottom');
   assert.match(img, /width="100%"/);
   assert.match(img, /alt="Language stack"/);
   assert.ok(!/<a [^>]*>\s*<img src="\.\/assets\/languages\.svg"/.test(md), 'languages must not be linked');
