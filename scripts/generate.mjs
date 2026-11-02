@@ -119,7 +119,7 @@ export function languagesSvg(rows) {
   const frame = `${cut},0 ${w},0 ${w},${h - cut} ${w - cut},${h} 0,${h} 0,${cut}`;
   const mono = `font-family="'JetBrains Mono', monospace"`;
   const body = rows.map(({ name, color, pct }, i) => {
-    const y = top + i * rh, c = color ?? tokens.muted, bw = Math.round(560 * pct / 10) / 10;
+    const y = top + i * rh, c = /^#[0-9a-fA-F]{3,8}$/.test(color ?? '') ? color : tokens.muted, bw = Math.round(560 * pct / 10) / 10;
     return `<circle cx="36" cy="${y + 9}" r="4" fill="${c}"/>
   <text x="52" y="${y + 14}" ${mono} font-size="14" fill="#E9ECEF">${esc(name)}</text>
   <rect x="180" y="${y}" width="560" height="18" fill="#0b0d0f" stroke="#000" stroke-width="2"/>

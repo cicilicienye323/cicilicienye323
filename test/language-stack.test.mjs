@@ -106,3 +106,10 @@ test('AC-7 README shows languages.svg below the cta, full width, not linked', as
   assert.match(img, /alt="Language stack"/);
   assert.ok(!/<a [^>]*>\s*<img src="\.\/assets\/languages\.svg"/.test(md), 'languages must not be linked');
 });
+
+// Security finding (05-TESTING): color from the API must be a hex color
+test('AC-3 color that is not a hex value falls back to muted', () => {
+  const svg = fn('languagesSvg')([{ name: 'Evil', color: '#fff" onload="x', pct: 50 }]);
+  assert.ok(!svg.includes('onload'), 'color must not reach the svg');
+  assert.ok(svg.includes('fill="#7D858F"'));
+});
