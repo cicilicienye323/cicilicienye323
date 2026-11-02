@@ -57,9 +57,20 @@ export function headerSvg() {
 `;
 }
 
+export function ctaSvg() {
+  const w = 280, h = 64, cut = 10;
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" role="img" aria-label="View portfolio">
+  <polygon points="${cut},0 ${w},0 ${w},${h - cut} ${w - cut},${h} 0,${h} 0,${cut}" fill="${tokens.lime}"/>
+  <text x="${w / 2}" y="38" text-anchor="middle" ${FONT} font-size="15" letter-spacing="3.3" fill="#000">VIEW PORTFOLIO ›</text>
+</svg>
+`;
+}
+
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const out = new URL('../assets/', import.meta.url);
   await mkdir(out, { recursive: true });
-  await writeFile(new URL('header.svg', out), headerSvg());
-  console.log('wrote assets/header.svg');
+  for (const [file, svg] of [['header.svg', headerSvg()], ['cta.svg', ctaSvg()]]) {
+    await writeFile(new URL(file, out), svg);
+    console.log(`wrote assets/${file}`);
+  }
 }

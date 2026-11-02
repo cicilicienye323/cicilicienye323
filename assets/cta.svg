@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="280" height="64" viewBox="0 0 280 64" role="img" aria-label="View portfolio">
+  <polygon points="10,0 280,0 280,54 270,64 0,64 0,10" fill="#C6FF00"/>
+  <text x="140" y="38" text-anchor="middle" font-family="'Chakra Petch', sans-serif" font-weight="700" font-size="15" letter-spacing="3.3" fill="#000">VIEW PORTFOLIO ›</text>
+</svg>
