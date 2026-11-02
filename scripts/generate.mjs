@@ -130,6 +130,60 @@ export function cityStats(cal) {
   return { total: cal.totalContributions, active: days.filter((d) => d.contributionCount > 0).length, busiest };
 }
 
+const r1 = (n) => Math.round(n * 10) / 10;
+// hsl -> #rrggbb, 7 chars instead of ~17: keeps a full-year city under 100 KB.
+const hex = (h, s, l) => {
+  s /= 100; l /= 100;
+  const k = (n) => (n + h / 30) % 12, a = s * Math.min(l, 1 - l);
+  const c = (n) => Math.round(255 * (l - a * Math.max(-1, Math.min(k(n) - 3, 9 - k(n), 1)))).toString(16).padStart(2, '0');
+  return `#${c(0)}${c(8)}${c(4)}`;
+};
+const shortDate = (iso) => new Date(`${iso}T00:00:00Z`).toLocaleString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' });
+
+// Isometric block per day: week w runs back to front, weekday d left to right.
+// Empty days get only a base tile; active days get top, left and right faces.
+export function citySvg(cal) {
+  const { total, active, busiest } = cityStats(cal);
+  const W = 8.6, H = 5, max = Math.max(1, busiest.count);
+  const blocks = [];
+  cal.weeks.forEach((week, w) => week.contributionDays.forEach((day) => {
+    const d = new Date(`${day.date}T00:00:00Z`).getUTCDay();
+    const x = r1(10 + (w + d) * W), y = r1(330 + (d - w) * H), v = day.contributionCount;
+    const p = (pts) => pts.map(([a, b]) => `${r1(a)},${r1(b)}`).join(' ');
+    if (!v) {
+      blocks.push({ w, d, svg: `<polygon points="${p([[x, y], [x + W, y - H], [x + 2 * W, y], [x + W, y + H]])}" fill="#232930"/>` });
+      return;
+    }
+    const t = v / max, h = 4 + 90 * t, hue = Math.round(330 - 140 * t), top = y - h;
+    blocks.push({ w, d, svg: `<polygon points="${p([[x, top], [x + W, top - H], [x + 2 * W, top], [x + W, top + H]])}" fill="${hex(hue, 100, 58)}"/>`
+      + `<polygon points="${p([[x, top], [x + W, top + H], [x + W, y + H], [x, y]])}" fill="${hex(hue, 90, 38)}"/>`
+      + `<polygon points="${p([[x + W, top + H], [x + 2 * W, top], [x + 2 * W, y], [x + W, y + H]])}" fill="${hex(hue, 90, 28)}"/>` });
+  }));
+  blocks.sort((a, b) => b.w - a.w || a.d - b.d);
+  const w = 840, h = 470, cut = 14, frame = `${cut},0 ${w},0 ${w},${h - cut} ${w - cut},${h} 0,${h} 0,${cut}`;
+  const mono = `font-family="'JetBrains Mono', monospace" font-weight="700" font-size="26" fill="${tokens.lime}"`;
+  const label = `${FONT} font-size="10" letter-spacing="2.2" fill="${tokens.muted}"`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" role="img" aria-label="Contribution city">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${tokens.surface}"/><stop offset="1" stop-color="${tokens.surface2}"/></linearGradient>
+    <pattern id="grid" width="28" height="28" patternUnits="userSpaceOnUse"><path d="M28 0H0V28" fill="none" stroke="#fff" stroke-opacity=".04"/></pattern>
+  </defs>
+  ${languagesFontFace}
+  <polygon points="${frame}" fill="url(#bg)"/>
+  <polygon points="${frame}" fill="url(#grid)"/>
+  <text x="30" y="40" ${FONT} font-size="11" letter-spacing="2.4" fill="${tokens.muted}">CONTRIBUTION MAP · LAST 365 DAYS</text>
+  <g transform="translate(30 78)" font-family="'Anton', Impact, sans-serif" font-size="34">
+    <text x="-2" fill="${tokens.magenta}" opacity=".8">THE CITY I BUILT THIS YEAR</text><text x="2" fill="${tokens.cyan}" opacity=".8">THE CITY I BUILT THIS YEAR</text><text fill="#E9ECEF">THE CITY I BUILT THIS YEAR</text>
+  </g>
+  <g class="city" transform="translate(20 92)">${blocks.map((b) => b.svg).join('')}</g>
+  <text x="640" y="250" ${mono}>${total}</text><text x="640" y="270" ${label}>CONTRIBUTIONS</text>
+  <text x="640" y="320" ${mono}>${active}</text><text x="640" y="340" ${label}>ACTIVE DAYS</text>
+  <text x="640" y="390" ${mono}>${busiest.date ? shortDate(busiest.date) : '-'}</text><text x="640" y="410" ${label}>BUSIEST DAY · ${Math.max(0, busiest.count)}</text>
+  <path d="M640 216H810M640 286H810M640 356H810" stroke="${tokens.line}"/>
+</svg>
+`;
+}
+
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
 export function languagesSvg(rows) {
