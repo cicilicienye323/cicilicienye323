@@ -3,10 +3,16 @@ import { readFileSync } from 'node:fs';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 
-// Chakra Petch Bold, subset to the glyphs used here (OFL, see fonts/OFL.txt).
-// Rebuild the subset when a new character appears in any label.
-const fontB64 = readFileSync(new URL('../fonts/ChakraPetch-Bold-subset.woff', import.meta.url)).toString('base64');
-const fontFace = `<style>@font-face { font-family: 'Chakra Petch'; font-weight: 700; src: url(data:font/woff;base64,${fontB64}) format('woff'); }</style>`;
+// Subset fonts, all OFL (see fonts/OFL-*.txt). Chakra Petch and Anton hold only
+// the glyphs of fixed labels: rebuild them when a label gets a new character.
+// JetBrains Mono holds all printable ASCII because language names change.
+const face = (family, file, weight) => {
+  const b64 = readFileSync(new URL(`../fonts/${file}`, import.meta.url)).toString('base64');
+  return `@font-face { font-family: '${family}'; font-weight: ${weight}; src: url(data:font/woff;base64,${b64}) format('woff'); }`;
+};
+const chakra = face('Chakra Petch', 'ChakraPetch-Bold-subset.woff', 700);
+const fontFace = `<style>${chakra}</style>`;
+const languagesFontFace = `<style>${chakra} ${face('Anton', 'Anton-subset.woff', 400)} ${face('JetBrains Mono', 'JetBrainsMono-Regular-subset.woff', 400)}</style>`;
 
 export const tokens = {
   surface: '#181B1F',
@@ -94,6 +100,7 @@ export function languagesSvg(rows) {
     <pattern id="grid" width="28" height="28" patternUnits="userSpaceOnUse"><path d="M28 0H0V28" fill="none" stroke="#fff" stroke-opacity=".04"/></pattern>
     <pattern id="ht" width="5" height="5" patternUnits="userSpaceOnUse"><circle cx="2.5" cy="2.5" r="1.2" fill="#000" fill-opacity=".35"/></pattern>
   </defs>
+  ${languagesFontFace}
   <style>
     .bar { transform-box: fill-box; transform-origin: left; animation: grow 1.4s cubic-bezier(.2,.8,.2,1) both; }
     @keyframes grow { from { transform: scaleX(0); } }
