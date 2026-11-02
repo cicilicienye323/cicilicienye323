@@ -74,6 +74,45 @@ export function ctaSvg() {
 `;
 }
 
+const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+export function languagesSvg(rows) {
+  const w = 840, top = 118, rh = 34, h = top + rows.length * rh + 26, cut = 14;
+  const frame = `${cut},0 ${w},0 ${w},${h - cut} ${w - cut},${h} 0,${h} 0,${cut}`;
+  const mono = `font-family="'JetBrains Mono', monospace"`;
+  const body = rows.map(({ name, color, pct }, i) => {
+    const y = top + i * rh, c = color ?? tokens.muted, bw = Math.round(560 * pct / 10) / 10;
+    return `<circle cx="36" cy="${y + 9}" r="4" fill="${c}"/>
+  <text x="52" y="${y + 14}" ${mono} font-size="14" fill="#E9ECEF">${esc(name)}</text>
+  <rect x="180" y="${y}" width="560" height="18" fill="#0b0d0f" stroke="#000" stroke-width="2"/>
+  <g class="bar"><rect x="181" y="${y + 1}" width="${bw}" height="16" fill="${c}"/><rect x="181" y="${y + 1}" width="${bw}" height="16" fill="url(#ht)"/></g>
+  <text x="808" y="${y + 14}" text-anchor="end" ${mono} font-size="14" fill="${tokens.lime}">${pct.toFixed(1)}%</text>`;
+  }).join('\n  ');
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" role="img" aria-label="Language stack">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${tokens.surface}"/><stop offset="1" stop-color="${tokens.surface2}"/></linearGradient>
+    <pattern id="grid" width="28" height="28" patternUnits="userSpaceOnUse"><path d="M28 0H0V28" fill="none" stroke="#fff" stroke-opacity=".04"/></pattern>
+    <pattern id="ht" width="5" height="5" patternUnits="userSpaceOnUse"><circle cx="2.5" cy="2.5" r="1.2" fill="#000" fill-opacity=".35"/></pattern>
+  </defs>
+  <style>
+    .bar { transform-box: fill-box; transform-origin: left; animation: grow 1.4s cubic-bezier(.2,.8,.2,1) both; }
+    @keyframes grow { from { transform: scaleX(0); } }
+    .cursor { animation: blink 1s steps(1) infinite; }
+    @keyframes blink { 50% { opacity: 0; } }
+    @media (prefers-reduced-motion: reduce) { .bar, .cursor { animation: none; } }
+  </style>
+  <polygon points="${frame}" fill="url(#bg)"/>
+  <polygon points="${frame}" fill="url(#grid)"/>
+  <text x="30" y="40" ${FONT} font-size="11" letter-spacing="2.4" fill="${tokens.muted}">SMALL EXPERIMENTS, BIG STACK</text>
+  <g transform="translate(30 78) skewX(-8)" font-family="'Anton', Impact, sans-serif" font-size="34">
+    <text x="-2" fill="${tokens.magenta}" opacity=".8">LANGUAGE STACK</text><text x="2" fill="${tokens.cyan}" opacity=".8">LANGUAGE STACK</text><text fill="#E9ECEF">LANGUAGE STACK</text>
+  </g>
+  <text x="30" y="102" ${mono} font-size="13" fill="${tokens.lime}">&gt; stack.scan_<tspan class="cursor">█</tspan></text>
+  ${body}
+</svg>
+`;
+}
+
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const out = new URL('../assets/', import.meta.url);
   await mkdir(out, { recursive: true });
