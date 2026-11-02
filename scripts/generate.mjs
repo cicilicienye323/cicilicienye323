@@ -85,14 +85,19 @@ export const REPO_QUERY = `query($cursor: String) {
   viewer {
     repositories(first: 100, after: $cursor, ownerAffiliations: OWNER, isFork: false) {
       pageInfo { hasNextPage endCursor }
-      nodes { languages(first: 20) { edges { size node { name color } } } }
+      nodes { name languages(first: 20) { edges { size node { name color } } } }
     }
   }
 }`;
 
+// Old practice repos whose 1.5 MB of generated HTML would drown every other
+// language (Papah, 2026-11-02). Remove a name here to count it again.
+export const IGNORED_REPOS = ['Simple_POS', 'PointOfSales'];
+
 export function languageTotals(nodes) {
   const totals = {};
-  for (const { languages } of nodes) {
+  for (const { name, languages } of nodes) {
+    if (IGNORED_REPOS.includes(name)) continue;
     for (const { size, node } of languages.edges) {
       totals[node.name] ??= { bytes: 0, color: node.color };
       totals[node.name].bytes += size;

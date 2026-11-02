@@ -113,3 +113,14 @@ test('AC-3 color that is not a hex value falls back to muted', () => {
   assert.ok(!svg.includes('onload'), 'color must not reach the svg');
   assert.ok(svg.includes('fill="#7D858F"'));
 });
+
+// AC-9
+test('AC-9 repos in IGNORED_REPOS are left out of the totals', () => {
+  assert.match(gen.REPO_QUERY ?? '', /nodes\s*\{\s*name\b/, 'query must ask repo name');
+  assert.deepEqual(gen.IGNORED_REPOS, ['Simple_POS', 'PointOfSales']);
+  const totals = fn('languageTotals')([
+    { name: 'Simple_POS', languages: { edges: [{ size: 1500000, node: { name: 'HTML', color: '#e34c26' } }] } },
+    { name: 'appointly', languages: { edges: [{ size: 100, node: { name: 'TypeScript', color: '#3178c6' } }] } },
+  ]);
+  assert.deepEqual(Object.keys(totals), ['TypeScript']);
+});
