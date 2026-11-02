@@ -35,6 +35,11 @@ export function headerSvg() {
     <pattern id="dots" width="6" height="6" patternUnits="userSpaceOnUse"><circle cx="3" cy="3" r="1.2" fill="${tokens.lime}"/></pattern>
     <path id="circ" d="M${cx},${cy} m-96,0 a96,96 0 1,1 192,0 a96,96 0 1,1 -192,0"/>
   </defs>
+  <style>
+    .spin { transform-origin: ${cx}px ${cy}px; animation: spin 30s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @media (prefers-reduced-motion: reduce) { .spin { animation: none; } }
+  </style>
   <polygon points="${frame}" fill="url(#bg)"/>
   <polygon points="${frame}" fill="url(#grid)"/>
   ${shard(40, 30, 12, '0,0 46,6 38,38 4,30')}
