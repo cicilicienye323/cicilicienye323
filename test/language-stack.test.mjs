@@ -11,7 +11,7 @@ const fn = (name) => {
   return gen[name];
 };
 
-// Sample data from sien-docs coba-language-stack (not real numbers).
+// Sample data, not real numbers.
 const NODES = [
   { languages: { edges: [{ size: 420000, node: { name: 'TypeScript', color: '#3178c6' } }, { size: 18000, node: { name: 'CSS', color: '#663399' } }] } },
   { languages: { edges: [{ size: 180000, node: { name: 'TypeScript', color: '#3178c6' } }, { size: 12000, node: { name: 'CSS', color: '#663399' } }, { size: 6000, node: { name: 'HTML', color: '#e34c26' } }] } },
@@ -115,12 +115,13 @@ test('AC-3 color that is not a hex value falls back to muted', () => {
 });
 
 // AC-9
-test('AC-9 repos in IGNORED_REPOS are left out of the totals', () => {
+test('AC-9 repos named in the IGNORED_REPOS env are left out of the totals', () => {
   assert.match(gen.REPO_QUERY ?? '', /nodes\s*\{\s*name\b/, 'query must ask repo name');
-  assert.deepEqual(gen.IGNORED_REPOS, ['Simple_POS', 'PointOfSales']);
+  assert.deepEqual(fn('parseIgnored')(' practice-a, practice-b ,'), ['practice-a', 'practice-b']);
+  assert.deepEqual(fn('parseIgnored')(undefined), []);
   const totals = fn('languageTotals')([
-    { name: 'Simple_POS', languages: { edges: [{ size: 1500000, node: { name: 'HTML', color: '#e34c26' } }] } },
-    { name: 'appointly', languages: { edges: [{ size: 100, node: { name: 'TypeScript', color: '#3178c6' } }] } },
-  ]);
+    { name: 'practice-a', languages: { edges: [{ size: 1500000, node: { name: 'HTML', color: '#e34c26' } }] } },
+    { name: 'repo-b', languages: { edges: [{ size: 100, node: { name: 'TypeScript', color: '#3178c6' } }] } },
+  ], ['practice-a']);
   assert.deepEqual(Object.keys(totals), ['TypeScript']);
 });

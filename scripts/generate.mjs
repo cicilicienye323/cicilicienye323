@@ -90,14 +90,15 @@ export const REPO_QUERY = `query($cursor: String) {
   }
 }`;
 
-// Old practice repos whose 1.5 MB of generated HTML would drown every other
-// language (Papah, 2026-11-02). Remove a name here to count it again.
-export const IGNORED_REPOS = ['Simple_POS', 'PointOfSales'];
+// Repo names to leave out of the language stack, comma separated, from the
+// IGNORED_REPOS env (an Actions variable), so the names stay out of the code.
+export const parseIgnored = (raw) => (raw ?? '').split(',').map((s) => s.trim()).filter(Boolean);
+const IGNORED_REPOS = parseIgnored(process.env.IGNORED_REPOS);
 
-export function languageTotals(nodes) {
+export function languageTotals(nodes, ignored = IGNORED_REPOS) {
   const totals = {};
   for (const { name, languages } of nodes) {
-    if (IGNORED_REPOS.includes(name)) continue;
+    if (ignored.includes(name)) continue;
     for (const { size, node } of languages.edges) {
       totals[node.name] ??= { bytes: 0, color: node.color };
       totals[node.name].bytes += size;
